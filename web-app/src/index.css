@@ -104,9 +104,42 @@ textarea {
 }
 
 .app-logo {
-  height: 44px;
+  height: 38px;
   width: auto;
   object-fit: contain;
+  /* El original es de 132x58: por encima de ~40px de alto se ve pixelado. */
+}
+
+.app-banner {
+  margin-bottom: 14px;
+  border-radius: var(--radio);
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  background: #fff;
+  line-height: 0;
+}
+
+.app-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* En pantallas bajas la foto se lleva media pantalla: la recortamos a una banda. */
+@media (max-height: 720px) and (min-width: 621px) {
+  .app-banner img {
+    height: 130px;
+    object-fit: cover;
+    object-position: center;
+  }
+}
+
+@media (max-width: 620px) {
+  .app-banner img {
+    height: 110px;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 
 .app-titulos h1 {

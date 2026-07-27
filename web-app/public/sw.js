@@ -1,7 +1,15 @@
 // Bumpear CACHE en CADA cambio del SW o del precache, si no los usuarios ven contenido viejo.
-const CACHE = "tacker-eqtorre-v1";
+const CACHE = "tacker-eqtorre-v2";
 
-const PRECACHE = ["./", "./index.html", "./manifest.json", "./tacker-logo.png"];
+const PRECACHE = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./tacker-logo.png",
+  "./header-equipo-torre.jpg",
+  "./icon-192.png",
+  "./icon-512.png",
+];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(

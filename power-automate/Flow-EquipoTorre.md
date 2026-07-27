@@ -9,13 +9,18 @@ exportá el paquete (`Exportar → Paquete (.zip)`) y commiteá el zip en esta m
 | Placeholder | Valor |
 |---|---|
 | `<SITE_URL>` | `https://tackersrl505.sharepoint.com/sites/TODOTACKER480` |
-| `<HEADER_LIST>` | Título real de la lista cabecera (el que devuelve el script de SharePoint, típicamente `Check List Equipo de Torre`) |
-| `<CHILD_LIST>` | Título real de la lista de ítems (típicamente `CheckListEquipodeTorre Items`) |
+| `<HEADER_LIST>` | `Check List Equipo de Torre` — GUID `c1a4fdf9-4c55-4e51-a5d9-023268d11a4f` |
+| `<CHILD_LIST>` | `CheckListEquipodeTorre Items` — GUID `8f96f01c-2008-467e-b9b7-aae30d5c79a5` |
 | `<NOTIFY_EMAIL>` | `jcastro@tackertools.com` |
 | `<TACKER_KEY>` | El mismo valor que se guarda en el secret `VITE_TACKER_KEY` |
 
-> El Título de la lista **no** es necesariamente el slug de la URL. Corré primero
-> `sharepoint/Setup-AllColumns-EquipoTorre.ps1`: imprime el Título real de cada lista.
+> **Estado de SharePoint: ya está listo.** Las 40 columnas y la lookup `Inspeccion`
+> están creadas y verificadas con un round-trip REST (acentos, Choices, fechas,
+> booleano, adjunto binario y lookup). Sólo falta armar este flujo.
+>
+> La columna `Título` quedó renombrada a **`Folio`** en la cabecera y a **`Ítem`** en
+> la lista hija. El InternalName sigue siendo `Title` en ambas — las expresiones no
+> cambian, sólo la etiqueta que ves en el formulario de Power Automate.
 
 ## Árbol final
 
@@ -91,7 +96,7 @@ contenido dinámico.
 
 | Columna SP | Tipo | Expresión `fx` |
 |---|---|---|
-| `Título` | Text | `variables('varFolio')` |
+| `Folio` (internal `Title`) | Text | `variables('varFolio')` |
 | `Site conducted` | Text | `triggerBody()?['siteConducted']` |
 | `Conducted on` | DateTime | `coalesce(triggerBody()?['conductedOn'], utcNow())` |
 | `Prepared by` | Text | `triggerBody()?['preparedBy']` |
@@ -209,7 +214,7 @@ Dentro del loop — **Crear elemento**, lista `<CHILD_LIST>`:
 
 | Columna SP | Expresión `fx` |
 |---|---|
-| `Título` | `items('Loop_checklist')?['item']` |
+| `Ítem` (internal `Title`) | `items('Loop_checklist')?['item']` |
 | `Categoría` | `items('Loop_checklist')?['categoria']` |
 | `Estado` **Value** | `if(empty(items('Loop_checklist')?['estado']), null, items('Loop_checklist')?['estado'])` |
 | `Comentarios` | `items('Loop_checklist')?['comentarios']` |

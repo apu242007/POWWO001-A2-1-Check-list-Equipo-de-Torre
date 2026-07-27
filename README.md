@@ -60,26 +60,42 @@ Estación de operación/piso 8 · Equipamiento control del pozo 2 · Safety Equi
 └── .github/workflows/deploy-pages.yml
 ```
 
-## Puesta en marcha (orden exacto)
+## Puesta en marcha
 
-1. **Crear las dos listas en SharePoint desde la UI.** REST está bloqueado por policy del tenant.
-   Usá los links `?npsAction=createList` de arriba.
-2. **Correr el script de columnas**:
-   ```powershell
-   pwsh -File sharepoint\Setup-AllColumns-EquipoTorre.ps1
-   ```
-   Pide un device code una vez (`https://microsoft.com/devicelogin`) y cachea el refresh token.
-   Imprime el **Título real** de cada lista — anotalo, lo necesitás para el flujo.
-3. **Crear la columna Lookup `Inspeccion` a mano** en la lista de **ítems** (la hija).
-   REST devuelve 400 para `SP.FieldLookup`. El script imprime los pasos al terminar.
-4. **Armar el flujo** siguiendo `power-automate/Flow-EquipoTorre.md` al pie de la letra.
-5. **Copiar la URL del trigger** y exportar el paquete `.zip` al repo.
-6. **Cargar los secrets** en GitHub: `VITE_POWER_AUTOMATE_URL` y `VITE_TACKER_KEY`.
-7. **Push a `main`** → el workflow despliega solo.
+### Ya hecho ✅
+
+1. **Listas creadas** en SharePoint (por UI — REST está bloqueado por policy del tenant).
+   - `Check List Equipo de Torre` — `c1a4fdf9-4c55-4e51-a5d9-023268d11a4f`
+   - `CheckListEquipodeTorre Items` — `8f96f01c-2008-467e-b9b7-aae30d5c79a5`
+2. **40 columnas creadas** con `sharepoint/Setup-AllColumns-EquipoTorre.ps1` (33 en la cabecera,
+   7 en la hija). InternalNames ASCII, nombres visibles con acentos.
+3. **Lookup `Inspeccion` creada** en la lista hija vía `createfieldasxml` (apunta a la cabecera
+   por `Title`). La columna `Title` quedó renombrada a `Folio` / `Ítem` respectivamente.
+4. **Round-trip REST verificado**: acentos (`Cañadón`, `Mástil`, `Señalización`), Choices
+   (`OBSERVADO`, `No`, `Abierto`, `OBSERVACION`), Number, Boolean, DateTime, adjunto binario y
+   la lookup resolviendo al ID del padre. Los datos de prueba se borraron: ambas listas en 0.
+
+### Pendiente
+
+5. **Armar el flujo** siguiendo `power-automate/Flow-EquipoTorre.md` al pie de la letra.
+6. **Copiar la URL del trigger** y exportar el paquete `.zip` al repo.
+7. **Cargar los secrets** en GitHub: `VITE_POWER_AUTOMATE_URL` y `VITE_TACKER_KEY`.
+   Hasta que estén cargados la app corre en modo demo.
 8. **Probar end-to-end desde un celular real**: cargar, firmar, enviar; verificar el item de
    SharePoint, los adjuntos, los ~130 ítems hijos y el mail.
 
-Si salteás el paso 1 o el 4, la SPA no da error: los datos simplemente desaparecen.
+Si salteás el paso 5, la SPA no da error: los datos simplemente desaparecen.
+
+### Correr el script de columnas de nuevo
+
+Es idempotente — reporta `= ya existe` y no rompe nada:
+
+```powershell
+pwsh -File sharepoint\Setup-AllColumns-EquipoTorre.ps1
+```
+
+Pide device code (`https://microsoft.com/devicelogin`) sólo si el refresh token cacheado en
+`%LOCALAPPDATA%\tacker-sp-eqtorre.rt` venció o se agotó.
 
 ## Desarrollo local
 

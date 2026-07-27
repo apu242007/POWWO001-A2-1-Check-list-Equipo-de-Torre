@@ -4,7 +4,7 @@ SPA pública (sin login) para cargar el check list de equipo de torre desde el c
 Los datos se archivan en dos listas de SharePoint vía un trigger HTTP de Power Automate,
 y se notifica por mail con el PDF adjunto.
 
-```
+```text
 [Cualquier usuario]
    │  HTTPS POST (JSON)
    ▼
@@ -16,9 +16,9 @@ y se notifica por mail con el PDF adjunto.
 ```
 
 | | |
-|---|---|
-| **Repo** | https://github.com/apu242007/POWWO001-A2-1-Check-list-Equipo-de-Torre |
-| **App** | https://apu242007.github.io/POWWO001-A2-1-Check-list-Equipo-de-Torre/ |
+| --- | --- |
+| **Repo** | [apu242007/POWWO001-A2-1-Check-list-Equipo-de-Torre](https://github.com/apu242007/POWWO001-A2-1-Check-list-Equipo-de-Torre) |
+| **App** | [apu242007.github.io/POWWO001-A2-1-Check-list-Equipo-de-Torre](https://apu242007.github.io/POWWO001-A2-1-Check-list-Equipo-de-Torre/) |
 | **Lista cabecera** | [Check List Equipo de Torre](https://tackersrl505.sharepoint.com/sites/TODOTACKER480/Lists/Check%20List%20Equipo%20de%20Torre/AllItems.aspx) |
 | **Lista de ítems** | [CheckListEquipodeTorre Items](https://tackersrl505.sharepoint.com/sites/TODOTACKER480/Lists/CheckListEquipodeTorre%20Items/AllItems.aspx) |
 | **Folio** | `ET-YYYYMMDD-NNNN` |
@@ -26,7 +26,7 @@ y se notifica por mail con el PDF adjunto.
 ## Contenido del formulario
 
 | Bloque | Detalle |
-|---|---|
+| --- | --- |
 | Datos generales | Site conducted, Conducted on, Prepared by, Location (+ GPS opcional) |
 | Check list | **16 secciones · 128 ítems** Sí / No / N/A |
 | Evidencia | Un ítem en **No** exige foto obligatoria (comentario opcional) |
@@ -43,7 +43,7 @@ Estación de operación/piso 8 · Equipamiento control del pozo 2 · Safety Equi
 
 ## Estructura
 
-```
+```text
 .
 ├── web-app/                  React 18 + Vite + TypeScript
 │   ├── src/
@@ -77,14 +77,14 @@ Estación de operación/piso 8 · Equipamiento control del pozo 2 · Safety Equi
 
 ### Pendiente
 
-5. **Armar el flujo** siguiendo `power-automate/Flow-EquipoTorre.md` al pie de la letra.
-6. **Copiar la URL del trigger** y exportar el paquete `.zip` al repo.
-7. **Cargar los secrets** en GitHub: `VITE_POWER_AUTOMATE_URL` y `VITE_TACKER_KEY`.
+1. **Armar el flujo** siguiendo `power-automate/Flow-EquipoTorre.md` al pie de la letra.
+2. **Copiar la URL del trigger** y exportar el paquete `.zip` al repo.
+3. **Cargar los secrets** en GitHub: `VITE_POWER_AUTOMATE_URL` y `VITE_TACKER_KEY`.
    Hasta que estén cargados la app corre en modo demo.
-8. **Probar end-to-end desde un celular real**: cargar, firmar, enviar; verificar el item de
+4. **Probar end-to-end desde un celular real**: cargar, firmar, enviar; verificar el item de
    SharePoint, los adjuntos, los ~130 ítems hijos y el mail.
 
-Si salteás el paso 5, la SPA no da error: los datos simplemente desaparecen.
+Sin el flujo la SPA no da error: los datos simplemente desaparecen.
 
 ### Correr el script de columnas de nuevo
 

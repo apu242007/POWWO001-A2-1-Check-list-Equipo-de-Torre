@@ -7,7 +7,7 @@ exportá el paquete (`Exportar → Paquete (.zip)`) y commiteá el zip en esta m
 ## Placeholders
 
 | Placeholder | Valor |
-|---|---|
+| --- | --- |
 | `<SITE_URL>` | `https://tackersrl505.sharepoint.com/sites/TODOTACKER480` |
 | `<HEADER_LIST>` | `Check List Equipo de Torre` — GUID `c1a4fdf9-4c55-4e51-a5d9-023268d11a4f` |
 | `<CHILD_LIST>` | `CheckListEquipodeTorre Items` — GUID `8f96f01c-2008-467e-b9b7-aae30d5c79a5` |
@@ -24,7 +24,7 @@ exportá el paquete (`Exportar → Paquete (.zip)`) y commiteá el zip en esta m
 
 ## Árbol final
 
-```
+```text
 When a HTTP request is received
 ├─ Check_key                   ← puerta 401 opcional
 ├─ Init_varFolio
@@ -42,7 +42,7 @@ When a HTTP request is received
 ## 1) Trigger — `Cuando se recibe una solicitud HTTP`
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | ¿Quién puede desencadenar el flujo? | **Cualquier persona** |
 | Método (opciones avanzadas) | `POST` |
 | Esquema JSON del cuerpo de la solicitud | **VACÍO — dejalo en blanco** |
@@ -64,6 +64,7 @@ Primera acción después del trigger.
 - Derecha: `<TACKER_KEY>`
 
 Rama **Si no**:
+
 1. `Response` → Status Code `401`, Body `{"error":"unauthorized"}`
 2. `Terminate` → Status `Failed`
 
@@ -77,7 +78,7 @@ Rama **En caso afirmativo**: vacía (el flujo sigue con las acciones de abajo).
 ## 3) `Init_varFolio` — Inicializar variable
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | Nombre | `varFolio` |
 | Tipo | `Cadena` |
 | Valor (`fx`) | `if(empty(triggerBody()?['folio']), concat('ET-', formatDateTime(utcNow(),'yyyyMMdd-HHmmss')), triggerBody()?['folio'])` |
@@ -95,7 +96,7 @@ Todos los campos van por la pestaña **`fx` Expresión** — nunca arrastres chi
 contenido dinámico.
 
 | Columna SP | Tipo | Expresión `fx` |
-|---|---|---|
+| --- | --- | --- |
 | `Folio` (internal `Title`) | Text | `variables('varFolio')` |
 | `Site conducted` | Text | `triggerBody()?['siteConducted']` |
 | `Conducted on` | DateTime | `coalesce(triggerBody()?['conductedOn'], utcNow())` |
@@ -132,6 +133,7 @@ contenido dinámico.
 | `Longitud` | Number | `if(equals(triggerBody()?['longitud'], null), null, float(triggerBody()?['longitud']))` |
 
 Por qué los wrappers:
+
 - **Choice**: `coalesce()` devuelve string, nunca `null` — sirve cuando hay default. Para un
   Choice opcional que puede venir vacío usá `if(empty(...), null, ...)`; el conector rechaza `""`.
 - **Number**: el `float()` explícito evita que `""` se convierta en `0` silenciosamente.
@@ -149,7 +151,7 @@ Devolver el 200 acá hace que la SPA reciba respuesta en ~3 s en lugar de espera
 HTTP 502 aunque el flujo después termine bien.
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | Código de estado | `200` |
 | Encabezados | `Content-Type` : `application/json` |
 | Cuerpo (`fx`) | `{ "id": @{outputs('CreateHeaderItem')?['body/ID']}, "folio": "@{variables('varFolio')}" }` |
@@ -163,7 +165,7 @@ HTTP 502 aunque el flujo después termine bien.
 ## 6) `Loop_attachments` — Aplicar a cada uno + Agregar datos adjuntos
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | Seleccione una salida (`fx`) | `triggerBody()?['attachments']` |
 | Configuración ⚙️ → Control de simultaneidad | **ACTIVADO · Grado de paralelismo = 1** |
 
@@ -173,7 +175,7 @@ SharePoint y en paralelo tiran `Save Conflict` de forma intermitente.
 Dentro del loop — **Agregar datos adjuntos** (SharePoint):
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | Dirección del sitio | `<SITE_URL>` |
 | Nombre de la lista | `<HEADER_LIST>` |
 | Id | `outputs('CreateHeaderItem')?['body/ID']` |
@@ -204,7 +206,7 @@ Orden de `attachments` que manda la SPA:
 ## 7) `Loop_checklist` — Aplicar a cada uno + Crear elemento (lista hija)
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | Seleccione una salida (`fx`) | `triggerBody()?['checklist']` |
 | Configuración ⚙️ → Control de simultaneidad | ACTIVADO · Grado de paralelismo = **20** |
 
@@ -213,7 +215,7 @@ Filas independientes → el paralelismo es seguro acá (a diferencia de los adju
 Dentro del loop — **Crear elemento**, lista `<CHILD_LIST>`:
 
 | Columna SP | Expresión `fx` |
-|---|---|
+| --- | --- |
 | `Ítem` (internal `Title`) | `items('Loop_checklist')?['item']` |
 | `Categoría` | `items('Loop_checklist')?['categoria']` |
 | `Estado` **Value** | `if(empty(items('Loop_checklist')?['estado']), null, items('Loop_checklist')?['estado'])` |
@@ -242,7 +244,7 @@ los ítems en `No` más las observaciones; hoy manda todo para tener trazabilida
 y `Loop_checklist`. Si no, un fallo de SharePoint dispara igual un mail de "éxito".
 
 | Campo | Valor |
-|---|---|
+| --- | --- |
 | Para | `<NOTIFY_EMAIL>` |
 | Asunto (`fx`) | ver abajo |
 | Cuerpo | HTML, ver abajo |
@@ -252,7 +254,7 @@ y `Loop_checklist`. Si no, un fallo de SharePoint dispara igual un mail de "éxi
 
 ### Asunto
 
-```
+```text
 concat(
   if(greater(coalesce(triggerBody()?['totalNo'], 0), 0), '⚠️ ', '✅ '),
   'Check List Equipo de Torre ', variables('varFolio'),
@@ -337,7 +339,7 @@ fecha UTC cruda confunde a cualquiera que lea el mail desde Argentina.
 ## Diagnóstico rápido
 
 | Síntoma | Causa | Arreglo |
-|---|---|---|
+| --- | --- | --- |
 | `Property selection is not supported on values of type 'String'` | La SPA mandó `Content-Type: text/plain` | Ya va `application/json`; si aparece, revisar proxies intermedios |
 | `'secAnnex' ya no está presente en el esquema de la operación` | El trigger tiene un esquema JSON viejo | Vaciar el esquema y volver a pegar la expresión en la pestaña `fx` |
 | `Missing Authorization header for a privileged call on connection` | Token del conector SharePoint/Outlook vencido | Power Automate → Conexiones → Reparar. No es un problema de código |

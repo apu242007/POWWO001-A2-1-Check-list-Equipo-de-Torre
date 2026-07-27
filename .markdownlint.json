@@ -1,0 +1,6 @@
+{
+  "$comment": "Config compartida editor/CLI. MD013 off: la doc del flujo tiene tablas con expresiones fx largas que no se pueden cortar sin romperlas.",
+  "MD013": false,
+  "MD024": { "siblings_only": true },
+  "MD033": false
+}

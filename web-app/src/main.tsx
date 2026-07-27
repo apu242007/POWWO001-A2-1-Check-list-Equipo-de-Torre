@@ -14,9 +14,14 @@ const BASE = import.meta.env.BASE_URL ?? "/";
 function registrarSW(): void {
   if (!("serviceWorker" in navigator)) return;
 
+  // En la PRIMERA instalación `controller` es null y `clients.claim()` dispara
+  // controllerchange igual. Recargar ahí sería una recarga gratuita para todo
+  // visitante nuevo: sólo interesa recargar cuando REEMPLAZAMOS un worker viejo.
+  const habiaControlador = navigator.serviceWorker.controller !== null;
+
   let recargando = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (recargando) return;
+    if (!habiaControlador || recargando) return;
     recargando = true;
     window.location.reload();
   });

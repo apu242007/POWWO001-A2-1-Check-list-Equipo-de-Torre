@@ -26,6 +26,29 @@ interface DraftSerializable extends Omit<InspeccionDraft, "respuestas"> {
   respuestas: Record<string, RespuestaSerializable>;
 }
 
+/**
+ * ¿El borrador tiene trabajo real del usuario?
+ * Los datos de cabecera NO cuentan: se pre-cargan desde el perfil del inspector,
+ * así que un formulario recién abierto los trae solo. Sin este filtro el autosave
+ * escribe un draft vacío y al recargar la app anuncia "se restauró un borrador"
+ * cuando en realidad no hay nada que restaurar.
+ */
+export function draftTieneContenido(draft: InspeccionDraft): boolean {
+  for (const r of Object.values(draft.respuestas)) {
+    if (r?.estado || r?.comentarios?.trim() || r?.evidenciaDataUrl) return true;
+  }
+  if (draft.observaciones.length > 0) return true;
+  if (Object.values(draft.secciones).some((v) => (v ?? "").trim() !== "")) return true;
+  if (
+    draft.firmaJefeEquipo.firmaDataUrl ||
+    draft.firmaTecnicoHSE.firmaDataUrl ||
+    draft.firmaCliente.firmaDataUrl
+  ) {
+    return true;
+  }
+  return draft.declaracionAceptada === true;
+}
+
 export function loadDraft(): InspeccionDraft | null {
   purgeLegacy();
   try {
@@ -55,6 +78,11 @@ export function loadDraft(): InspeccionDraft | null {
 }
 
 export function saveDraft(draft: InspeccionDraft): void {
+  if (!draftTieneContenido(draft)) {
+    // Nada que guardar todavía; además limpiamos restos de una sesión anterior.
+    clearDraft();
+    return;
+  }
   try {
     const respuestas: Record<string, RespuestaSerializable> = {};
     for (const [id, r] of Object.entries(draft.respuestas)) {

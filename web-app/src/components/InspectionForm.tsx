@@ -23,7 +23,13 @@ import type {
   SeccionDef,
   SeccionTextoKey,
 } from "../types";
-import { clearDraft, draftTimestamp, loadDraft, saveDraft } from "../lib/draftStorage";
+import {
+  clearDraft,
+  draftTieneContenido,
+  draftTimestamp,
+  loadDraft,
+  saveDraft,
+} from "../lib/draftStorage";
 import { loadInspectorProfile, saveInspectorProfile } from "../lib/inspectorProfile";
 import { blobToDataUrl, compressToFile } from "../lib/imageUtils";
 import { buildChecklistPdfAsync } from "../lib/pdfGenerator";
@@ -79,7 +85,7 @@ export default function InspectionForm() {
   // ---------------- Carga inicial: draft + perfil ----------------
   useEffect(() => {
     const guardado = loadDraft();
-    if (guardado) {
+    if (guardado && draftTieneContenido(guardado)) {
       setDraft({ ...guardado, folio: guardado.folio ?? generarFolio() });
       setRestaurado(draftTimestamp());
       return;

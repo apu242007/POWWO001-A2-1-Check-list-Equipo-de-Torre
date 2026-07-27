@@ -119,26 +119,22 @@ textarea {
   line-height: 0;
 }
 
+/*
+ * `contain` y no `cover`: el equipo tiene que verse entero. Con `cover` el
+ * recorte se come las ruedas y la punta del mástil, que es justamente lo que
+ * identifica al equipo. Como la foto ya viene sobre blanco, el relleno que deja
+ * `contain` se funde con el fondo del banner y no se nota.
+ */
 .app-banner img {
   width: 100%;
-  height: auto;
+  max-height: 190px;
+  object-fit: contain;
   display: block;
-}
-
-/* En pantallas bajas la foto se lleva media pantalla: la recortamos a una banda. */
-@media (max-height: 720px) and (min-width: 621px) {
-  .app-banner img {
-    height: 130px;
-    object-fit: cover;
-    object-position: center;
-  }
 }
 
 @media (max-width: 620px) {
   .app-banner img {
-    height: 110px;
-    object-fit: cover;
-    object-position: center;
+    max-height: 120px;
   }
 }
 

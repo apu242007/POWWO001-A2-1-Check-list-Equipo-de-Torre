@@ -87,7 +87,35 @@ Rama **En caso afirmativo**: vacía (el flujo sigue con las acciones de abajo).
 
 ## 4) `CreateHeaderItem` — SharePoint · Crear elemento
 
-Renombrá la acción a **`CreateHeaderItem`** (los `outputs('CreateHeaderItem')` de abajo dependen del nombre).
+### ⚠️ Renombrá la acción ANTES de escribir cualquier expresión
+
+Este es el error más común al armar este flujo:
+
+> *"Corrija esto para incluir una referencia válida a `CreateHeaderItem` para los parámetros de
+> entrada de la acción `Respuesta` / `Agregar_datos_adjuntos` / `Crear_elemento`."*
+
+Power Automate no resuelve las expresiones por el nombre que ves, sino por el **nombre interno**
+de la acción, que se deriva del nombre visible: espacios → `_`, acentos removidos. Una acción
+recién agregada se llama `Crear elemento` → id interno `Crear_elemento`. Si escribís
+`outputs('CreateHeaderItem')` cuando la acción todavía se llama así, no existe y el diseñador
+se queja en las **tres** acciones que la referencian.
+
+Pasos, en este orden:
+
+1. Click en la acción de SharePoint que crea el item de la **cabecera**
+2. `⋯` → **Cambiar nombre**
+3. Escribir exactamente `CreateHeaderItem` — sin espacios, sin acentos, respetando mayúsculas
+4. **Recién ahora** cargar las expresiones de los pasos 5, 6 y 7
+
+Si preferís no renombrar, usá el nombre interno real en las tres expresiones
+(`outputs('Crear_elemento')?['body/ID']`). No lo recomiendo: hay **dos** acciones "Crear
+elemento" en este flujo (cabecera e hija), la segunda queda como `Crear_elemento_2` y cualquier
+reordenamiento posterior rompe las referencias en silencio.
+
+Renombrar después de haber escrito las expresiones tampoco arregla solo: hay que volver a entrar
+a cada una de las tres y re-pegar la expresión.
+
+### Campos
 
 - Dirección del sitio: `<SITE_URL>`
 - Nombre de la lista: `<HEADER_LIST>`
@@ -326,7 +354,9 @@ fecha UTC cruda confunde a cualquiera que lea el mail desde Argentina.
 
 - [ ] Esquema del trigger **vacío** (no "sincronizado": vacío)
 - [ ] `varFolio` con fallback `concat('ET-', formatDateTime(utcNow(),'yyyyMMdd-HHmmss'))`
-- [ ] La acción se llama **`CreateHeaderItem`**
+- [ ] La acción de crear la cabecera se **renombró a `CreateHeaderItem` ANTES** de escribir
+      las expresiones que la referencian (si no: *"Corrija esto para incluir una referencia
+      válida a CreateHeaderItem"* en `Respuesta`, `Agregar_datos_adjuntos` y `Crear_elemento`)
 - [ ] Todos los campos cargados desde la pestaña `fx` (ningún chip naranja de contenido dinámico)
 - [ ] `Respuesta` **entre** `CreateHeaderItem` y `Loop_attachments`
 - [ ] `Loop_attachments` con simultaneidad **1**
@@ -340,6 +370,7 @@ fecha UTC cruda confunde a cualquiera que lea el mail desde Argentina.
 
 | Síntoma | Causa | Arreglo |
 | --- | --- | --- |
+| `Corrija esto para incluir una referencia válida a 'CreateHeaderItem'…` (en `Respuesta`, `Agregar_datos_adjuntos` y `Crear_elemento`) | La acción de la cabecera no se llama `CreateHeaderItem`: su nombre interno sigue siendo `Crear_elemento`, así que `outputs('CreateHeaderItem')` apunta a algo inexistente | `⋯` → **Cambiar nombre** → `CreateHeaderItem`, y después re-pegar la expresión en las tres acciones (ver paso 4) |
 | `Property selection is not supported on values of type 'String'` | La SPA mandó `Content-Type: text/plain` | Ya va `application/json`; si aparece, revisar proxies intermedios |
 | `'secAnnex' ya no está presente en el esquema de la operación` | El trigger tiene un esquema JSON viejo | Vaciar el esquema y volver a pegar la expresión en la pestaña `fx` |
 | `Missing Authorization header for a privileged call on connection` | Token del conector SharePoint/Outlook vencido | Power Automate → Conexiones → Reparar. No es un problema de código |

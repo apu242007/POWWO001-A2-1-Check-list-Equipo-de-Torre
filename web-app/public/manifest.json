@@ -1,0 +1,25 @@
+{
+  "name": "Check List Equipo de Torre · Tacker",
+  "short_name": "CL Equipo Torre",
+  "description": "POWWO001-A2-1 REV2 — Check list de equipo de torre",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f2a44",
+  "lang": "es-AR",
+  "icons": [
+    {
+      "src": "tacker-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "tacker-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

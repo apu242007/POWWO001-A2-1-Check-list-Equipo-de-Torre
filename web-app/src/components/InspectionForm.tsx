@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import SignaturePad from "./SignaturePad";
 import {
+  EQUIPOS,
   ESTADOS_ITEM,
   ESTADOS_OBSERVACION,
   ITEM_INDEX,
@@ -112,7 +113,7 @@ export default function InspectionForm() {
 
   const conteo = useMemo(() => contarChecklist(draft.respuestas), [draft.respuestas]);
   const estadoGeneral = derivarEstadoGeneral(conteo);
-  const respondidos = conteo.si + conteo.no + conteo.na;
+  const respondidos = conteo.bien + conteo.mal + conteo.na;
 
   // ---------------- Mutadores (siempre funcionales) ----------------
   const setCampo = useCallback(<K extends keyof InspeccionDraft>(k: K, v: InspeccionDraft[K]) => {
@@ -126,8 +127,8 @@ export default function InspectionForm() {
   const setEstado = useCallback((itemId: string, estado: EstadoItem) => {
     setDraft((d) => {
       const prev = d.respuestas[itemId] ?? {};
-      // Cambiar a Sí/N-A descarta la evidencia: ya no aplica.
-      const limpiar = estado !== "No";
+      // Pasar a BIEN o N/A descarta la evidencia: ya no aplica.
+      const limpiar = estado !== "MAL";
       return {
         ...d,
         respuestas: {
@@ -261,7 +262,7 @@ export default function InspectionForm() {
         .join(", ");
       const resto = conteo.sinEvidencia.length - 3;
       p.push(
-        `Adjuntar evidencia en ${conteo.sinEvidencia.length} ítem(s) respondidos "No": ${nombres}${
+        `Adjuntar evidencia en ${conteo.sinEvidencia.length} ítem(s) en MAL: ${nombres}${
           resto > 0 ? ` y ${resto} más` : ""
         }`,
       );
@@ -459,8 +460,8 @@ export default function InspectionForm() {
           <span className="chip">
             {respondidos}/{TOTAL_ITEMS} respondidos
           </span>
-          <span className="chip chip-ok">Sí {conteo.si}</span>
-          <span className="chip chip-no">No {conteo.no}</span>
+          <span className="chip chip-ok">BIEN {conteo.bien}</span>
+          <span className="chip chip-no">MAL {conteo.mal}</span>
           <span className="chip chip-na">N/A {conteo.na}</span>
           <span className={estadoGeneral === "OK" ? "chip chip-ok" : "chip chip-no"}>
             {estadoGeneral}
@@ -474,13 +475,17 @@ export default function InspectionForm() {
         <div className="grid-2">
           <label>
             Site conducted *
-            <input
-              type="text"
+            <select
               value={draft.siteConducted ?? ""}
               onChange={(e) => setCampo("siteConducted", e.target.value)}
-              placeholder="Equipo / locación donde se realiza"
-              autoComplete="off"
-            />
+            >
+              <option value="">Seleccionar equipo…</option>
+              {EQUIPOS.map((eq) => (
+                <option key={eq} value={eq}>
+                  {eq}
+                </option>
+              ))}
+            </select>
           </label>
           <label>
             Conducted on *
@@ -491,7 +496,7 @@ export default function InspectionForm() {
             />
           </label>
           <label>
-            Prepared by *
+            Confeccionado por *
             <input
               type="text"
               value={draft.preparedBy ?? ""}
@@ -527,7 +532,7 @@ export default function InspectionForm() {
       {SECCIONES.map((sec, i) => {
         const total = sec.items.length;
         const hechos = sec.items.filter((it) => draft.respuestas[it.id]?.estado).length;
-        const noes = sec.items.filter((it) => draft.respuestas[it.id]?.estado === "No").length;
+        const malos = sec.items.filter((it) => draft.respuestas[it.id]?.estado === "MAL").length;
         const abierta = abiertas[sec.id] ?? false;
         return (
           <section className="bloque" key={sec.id}>
@@ -544,7 +549,7 @@ export default function InspectionForm() {
                 <span className={hechos === total ? "chip chip-ok" : "chip"}>
                   {hechos}/{total}
                 </span>
-                {noes > 0 && <span className="chip chip-no">{noes} No</span>}
+                {malos > 0 && <span className="chip chip-no">{malos} MAL</span>}
                 <span className="bloque-caret">{abierta ? "▾" : "▸"}</span>
               </span>
             </button>
@@ -570,9 +575,9 @@ export default function InspectionForm() {
                   <button
                     type="button"
                     className="btn-link"
-                    onClick={() => marcarSeccion(sec, "Sí")}
+                    onClick={() => marcarSeccion(sec, "BIEN")}
                   >
-                    Completar restantes con “Sí”
+                    Completar restantes con “BIEN”
                   </button>
                   <button
                     type="button"
@@ -586,8 +591,8 @@ export default function InspectionForm() {
                 <ul className="items">
                   {sec.items.map((it) => {
                     const r = draft.respuestas[it.id];
-                    const esNo = r?.estado === "No";
-                    const faltaEvidencia = esNo && !r?.evidenciaDataUrl;
+                    const esMal = r?.estado === "MAL";
+                    const faltaEvidencia = esMal && !r?.evidenciaDataUrl;
                     return (
                       <li className={faltaEvidencia ? "item item-alerta" : "item"} key={it.id}>
                         <div className="item-texto">{it.texto}</div>
@@ -596,7 +601,11 @@ export default function InspectionForm() {
                             <label
                               key={op}
                               className={
-                                r?.estado === op ? `opt opt-${op === "N/A" ? "na" : op === "Sí" ? "si" : "no"} opt-sel` : "opt"
+                                r?.estado === op
+                                  ? `opt opt-${
+                                      op === "N/A" ? "na" : op === "BIEN" ? "bien" : "mal"
+                                    } opt-sel`
+                                  : "opt"
                               }
                             >
                               <input
@@ -610,7 +619,7 @@ export default function InspectionForm() {
                           ))}
                         </div>
 
-                        {esNo && (
+                        {esMal && (
                           <div className="item-detalle">
                             <textarea
                               className="item-comentario"

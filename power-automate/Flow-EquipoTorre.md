@@ -128,7 +128,7 @@ contenido dinámico.
 | `Folio` (internal `Title`) | Text | `variables('varFolio')` |
 | `Site conducted` | Text | `triggerBody()?['siteConducted']` |
 | `Conducted on` | DateTime | `coalesce(triggerBody()?['conductedOn'], utcNow())` |
-| `Prepared by` | Text | `triggerBody()?['preparedBy']` |
+| `Confeccionado por` | Text | `triggerBody()?['preparedBy']` |
 | `Location` | Text | `triggerBody()?['location']` |
 | `Fundación` | Text | `triggerBody()?['secFundacion']` |
 | `Herramientas de mano` | Text | `triggerBody()?['secHerramientasMano']` |
@@ -146,8 +146,8 @@ contenido dinámico.
 | `Annex` | Text | `triggerBody()?['secAnnex']` |
 | `Estado general` **Value** | Choice | `coalesce(triggerBody()?['estadoGeneral'], 'OK')` |
 | `Total ítems respondidos` | Number | `if(equals(triggerBody()?['totalItems'], null), null, float(triggerBody()?['totalItems']))` |
-| `Total Sí` | Number | `if(equals(triggerBody()?['totalSi'], null), null, float(triggerBody()?['totalSi']))` |
-| `Total No` | Number | `if(equals(triggerBody()?['totalNo'], null), null, float(triggerBody()?['totalNo']))` |
+| `Total BIEN` | Number | `if(equals(triggerBody()?['totalBien'], null), null, float(triggerBody()?['totalBien']))` |
+| `Total MAL` | Number | `if(equals(triggerBody()?['totalMal'], null), null, float(triggerBody()?['totalMal']))` |
 | `Total N/A` | Number | `if(equals(triggerBody()?['totalNa'], null), null, float(triggerBody()?['totalNa']))` |
 | `Observaciones relevantes` | Note | `triggerBody()?['observacionesResumen']` |
 | `Jefe de Equipo` | Text | `triggerBody()?['jefeEquipoNombre']` |
@@ -284,11 +284,11 @@ y `Loop_checklist`. Si no, un fallo de SharePoint dispara igual un mail de "éxi
 
 ```text
 concat(
-  if(greater(coalesce(triggerBody()?['totalNo'], 0), 0), '⚠️ ', '✅ '),
+  if(greater(coalesce(triggerBody()?['totalMal'], 0), 0), '⚠️ ', '✅ '),
   'Check List Equipo de Torre ', variables('varFolio'),
   ' — ', coalesce(triggerBody()?['siteConducted'], 's/d'),
-  if(greater(coalesce(triggerBody()?['totalNo'], 0), 0),
-     concat(' · ', string(triggerBody()?['totalNo']), ' desvío(s)'),
+  if(greater(coalesce(triggerBody()?['totalMal'], 0), 0),
+     concat(' · ', string(triggerBody()?['totalMal']), ' desvío(s)'),
      '')
 )
 ```
@@ -300,11 +300,11 @@ concat(
   <h2 style="color:#0f2a44;margin:0 0 4px">Check List Equipo de Torre</h2>
   <div style="color:#6e7882;font-size:12px;margin-bottom:14px">POWWO001-A2-1 · REV2</div>
 
-  @{if(greater(coalesce(triggerBody()?['totalNo'], 0), 0),
+  @{if(greater(coalesce(triggerBody()?['totalMal'], 0), 0),
     concat(
       '<div style="background:#fee2e2;border-left:6px solid #b91c1c;padding:12px 14px;border-radius:6px;margin-bottom:14px">',
-        '<div style="font-weight:700;color:#b91c1c">🔴 ', string(triggerBody()?['totalNo']),
-        ' ítem(s) respondidos NO — requieren acción</div>',
+        '<div style="font-weight:700;color:#b91c1c">🔴 ', string(triggerBody()?['totalMal']),
+        ' ítem(s) en MAL — requieren acción</div>',
         '<div style="font-size:12px;color:#7f1d1d;margin-top:4px">La evidencia fotográfica está adjunta al elemento de SharePoint.</div>',
       '</div>'),
     '<div style="background:#dcfce7;border-left:6px solid #15803d;padding:12px 14px;border-radius:6px;margin-bottom:14px;font-weight:700;color:#15803d">✅ Sin desvíos</div>'
@@ -314,10 +314,10 @@ concat(
     <tr><td style="background:#f4f6f9;font-weight:600">Folio</td><td>@{variables('varFolio')}</td></tr>
     <tr><td style="background:#f4f6f9;font-weight:600">Site conducted</td><td>@{triggerBody()?['siteConducted']}</td></tr>
     <tr><td style="background:#f4f6f9;font-weight:600">Conducted on</td><td>@{convertTimeZone(coalesce(triggerBody()?['conductedOn'], utcNow()), 'UTC', 'Argentina Standard Time', 'dd/MM/yyyy HH:mm')}</td></tr>
-    <tr><td style="background:#f4f6f9;font-weight:600">Prepared by</td><td>@{triggerBody()?['preparedBy']}</td></tr>
+    <tr><td style="background:#f4f6f9;font-weight:600">Confeccionado por</td><td>@{triggerBody()?['preparedBy']}</td></tr>
     <tr><td style="background:#f4f6f9;font-weight:600">Location</td><td>@{triggerBody()?['location']}</td></tr>
     <tr><td style="background:#f4f6f9;font-weight:600">Estado general</td><td><b>@{triggerBody()?['estadoGeneral']}</b></td></tr>
-    <tr><td style="background:#f4f6f9;font-weight:600">Sí / No / N-A</td><td>@{triggerBody()?['totalSi']} / @{triggerBody()?['totalNo']} / @{triggerBody()?['totalNa']}</td></tr>
+    <tr><td style="background:#f4f6f9;font-weight:600">BIEN / MAL / N-A</td><td>@{triggerBody()?['totalBien']} / @{triggerBody()?['totalMal']} / @{triggerBody()?['totalNa']}</td></tr>
     <tr><td style="background:#f4f6f9;font-weight:600">Jefe de Equipo</td><td>@{triggerBody()?['jefeEquipoNombre']}</td></tr>
     <tr><td style="background:#f4f6f9;font-weight:600">Técnico HSE</td><td>@{triggerBody()?['tecnicoHseNombre']}</td></tr>
     <tr><td style="background:#f4f6f9;font-weight:600">Inspección Cliente</td><td>@{triggerBody()?['clienteNombre']}</td></tr>
@@ -377,5 +377,5 @@ fecha UTC cruda confunde a cualquiera que lea el mail desde Argentina.
 | HTTP 502 en el navegador | El flujo tardó > 110 s | Verificar que `Respuesta` esté **antes** de los loops |
 | `Save Conflict` en `Add_attachment` | Simultaneidad del loop de adjuntos > 1 | Ponerla en 1 |
 | Adjunto en SP con ícono de imagen rota | `body` con objeto JSON o `\r\n` al final | Vista de código → dejar sólo `@base64ToBinary(...)` |
-| Columna Estado vacía en la lista hija | El valor no está entre los Choices de SP | Verificar que los choices sean `Sí`, `No`, `N/A`, `Abierto`, `Cerrado` |
+| Columna Estado vacía en la lista hija | El valor no está entre los Choices de SP | Verificar que los choices sean `BIEN`, `MAL`, `N/A`, `Abierto`, `Cerrado` |
 | Dos mails por envío | `Send_email_V2` adentro de un loop | Moverlo a la raíz |

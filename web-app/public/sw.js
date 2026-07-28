@@ -1,5 +1,5 @@
 // Bumpear CACHE en CADA cambio del SW o del precache, si no los usuarios ven contenido viejo.
-const CACHE = "tacker-eqtorre-v3";
+const CACHE = "tacker-eqtorre-v4";
 
 const PRECACHE = [
   "./",

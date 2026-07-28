@@ -62,8 +62,8 @@ export interface InspeccionPayload {
 
   estadoGeneral: string;
   totalItems: number;
-  totalSi: number;
-  totalNo: number;
+  totalBien: number;
+  totalMal: number;
   totalNa: number;
   observacionesResumen: string;
 
@@ -234,9 +234,9 @@ export async function buildPayload(
     secAnnex: limpio(s.annex),
 
     estadoGeneral,
-    totalItems: conteo.si + conteo.no + conteo.na,
-    totalSi: conteo.si,
-    totalNo: conteo.no,
+    totalItems: conteo.bien + conteo.mal + conteo.na,
+    totalBien: conteo.bien,
+    totalMal: conteo.mal,
     totalNa: conteo.na,
     observacionesResumen,
 

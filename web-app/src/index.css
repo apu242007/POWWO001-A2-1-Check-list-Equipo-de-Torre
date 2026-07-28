@@ -439,13 +439,13 @@ textarea {
   height: 15px;
 }
 
-.opt-sel.opt-si {
+.opt-sel.opt-bien {
   background: var(--ok-bg);
   border-color: var(--ok);
   color: var(--ok);
 }
 
-.opt-sel.opt-no {
+.opt-sel.opt-mal {
   background: var(--no-bg);
   border-color: var(--no);
   color: var(--no);

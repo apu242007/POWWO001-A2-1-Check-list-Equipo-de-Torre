@@ -27,9 +27,9 @@ y se notifica por mail con el PDF adjunto.
 
 | Bloque | Detalle |
 | --- | --- |
-| Datos generales | Site conducted, Conducted on, Prepared by, Location (+ GPS opcional) |
-| Check list | **16 secciones · 128 ítems** Sí / No / N/A |
-| Evidencia | Un ítem en **No** exige foto obligatoria (comentario opcional) |
+| Datos generales | Site conducted (desplegable de equipos TKR), Conducted on, Confeccionado por, Location (+ GPS opcional) |
+| Check list | **16 secciones · 128 ítems** BIEN / MAL / N/A |
+| Evidencia | Un ítem en **MAL** exige foto obligatoria (comentario opcional) |
 | Campos de sección | 14 campos de texto libre que identifican cada bloque |
 | Observaciones | Repetibles: detalle + estado (Abierto/Cerrado) + fecha de cumplimiento |
 | Firmas | 3 obligatorias: Jefe de Equipo, Técnico HSE, Inspección Cliente (nombre + firma + fecha) |
@@ -72,7 +72,7 @@ Estación de operación/piso 8 · Equipamiento control del pozo 2 · Safety Equi
 3. **Lookup `Inspeccion` creada** en la lista hija vía `createfieldasxml` (apunta a la cabecera
    por `Title`). La columna `Title` quedó renombrada a `Folio` / `Ítem` respectivamente.
 4. **Round-trip REST verificado**: acentos (`Cañadón`, `Mástil`, `Señalización`), Choices
-   (`OBSERVADO`, `No`, `Abierto`, `OBSERVACION`), Number, Boolean, DateTime, adjunto binario y
+   (`OBSERVADO`, `MAL`, `Abierto`, `OBSERVACION`), Number, Boolean, DateTime, adjunto binario y
    la lookup resolviendo al ID del padre. Los datos de prueba se borraron: ambas listas en 0.
 
 ### Pendiente
@@ -136,9 +136,9 @@ Azure API Management) con rate limiting, no un CAPTCHA.
   es accionable. Se archiva en `Título`/`Comentarios` de la lista hija.
 - **Nombre en las firmas**: el original pide firma + fecha. Se agregó **Nombre** obligatorio para
   poder identificar al firmante en SharePoint.
-- **Evidencia en "No"**: se exige la **foto**; el comentario queda opcional (el original sólo
+- **Evidencia en "MAL"**: se exige la **foto**; el comentario queda opcional (el original sólo
   menciona evidencia).
-- **Estado general**: derivado, no cargado a mano. `OBSERVADO` si hay al menos un "No", si no `OK`.
+- **Estado general**: derivado, no cargado a mano. `OBSERVADO` si hay al menos un "MAL", si no `OK`.
 - **Observaciones en la lista hija**: van como filas con `Tipo = OBSERVACION` en la misma lista de
   ítems, para no crear una tercera lista. La cabecera además guarda un resumen en texto.
 - **Fechas**: el payload y las columnas de SharePoint son **UTC**. Las fechas sin hora se mandan

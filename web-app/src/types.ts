@@ -1,12 +1,23 @@
 // POWWO001-A2-1 · Check List Equipo de Torre (REV2)
 // Fuente de verdad del formulario: secciones, ítems y shape del draft.
 
-export type EstadoItem = "Sí" | "No" | "N/A";
+export type EstadoItem = "BIEN" | "MAL" | "N/A";
 
-export const ESTADOS_ITEM: EstadoItem[] = ["Sí", "No", "N/A"];
+export const ESTADOS_ITEM: EstadoItem[] = ["BIEN", "MAL", "N/A"];
 
-/** Un "No" obliga a adjuntar evidencia fotográfica. */
-export const ESTADO_REQUIERE_EVIDENCIA: EstadoItem = "No";
+/** Un "MAL" obliga a adjuntar evidencia fotográfica. */
+export const ESTADO_REQUIERE_EVIDENCIA: EstadoItem = "MAL";
+
+/** Equipos de la flota. Lista cerrada: el desplegable no admite valores nuevos. */
+export const EQUIPOS = [
+  "TKR-01",
+  "TKR-05",
+  "TKR-06",
+  "TKR-07",
+  "TKR-08",
+  "TKR-10",
+  "TKR-11",
+] as const;
 
 export type EstadoObservacion = "Abierto" | "Cerrado";
 export const ESTADOS_OBSERVACION: EstadoObservacion[] = ["Abierto", "Cerrado"];
@@ -327,7 +338,7 @@ export const TOTAL_ITEMS = Object.keys(ITEM_INDEX).length;
 export interface RespuestaItem {
   estado?: EstadoItem;
   comentarios?: string;
-  /** Foto de evidencia. Obligatoria cuando estado === "No". */
+  /** Foto de evidencia. Obligatoria cuando estado === "MAL". */
   evidencia?: File | null;
   /** dataURL persistida en el draft (para sobrevivir un refresh). */
   evidenciaDataUrl?: string;
@@ -406,17 +417,17 @@ export const TEXTO_DECLARACION =
 // ---------------------------------------------------------------------------
 
 export interface ConteoChecklist {
-  si: number;
-  no: number;
+  bien: number;
+  mal: number;
   na: number;
   sinResponder: number;
-  /** ids con estado "No" y sin foto de evidencia. */
+  /** ids con estado "MAL" y sin foto de evidencia. */
   sinEvidencia: string[];
 }
 
 export function contarChecklist(respuestas: Record<string, RespuestaItem>): ConteoChecklist {
-  let si = 0;
-  let no = 0;
+  let bien = 0;
+  let mal = 0;
   let na = 0;
   let sinResponder = 0;
   const sinEvidencia: string[] = [];
@@ -427,20 +438,20 @@ export function contarChecklist(respuestas: Record<string, RespuestaItem>): Cont
       sinResponder += 1;
       continue;
     }
-    if (r.estado === "Sí") si += 1;
+    if (r.estado === "BIEN") bien += 1;
     else if (r.estado === "N/A") na += 1;
     else {
-      no += 1;
+      mal += 1;
       if (!r.evidencia && !r.evidenciaDataUrl) sinEvidencia.push(id);
     }
   }
-  return { si, no, na, sinResponder, sinEvidencia };
+  return { bien, mal, na, sinResponder, sinEvidencia };
 }
 
 export type EstadoGeneral = "OK" | "OBSERVADO";
 
 export function derivarEstadoGeneral(conteo: ConteoChecklist): EstadoGeneral {
-  return conteo.no > 0 ? "OBSERVADO" : "OK";
+  return conteo.mal > 0 ? "OBSERVADO" : "OK";
 }
 
 /** Folio: ET-YYYYMMDD-NNNN (NNNN aleatorio, estable durante toda la carga). */

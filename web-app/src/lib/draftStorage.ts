@@ -2,11 +2,13 @@ import type { InspeccionDraft, RespuestaItem } from "../types";
 import { draftVacio } from "../types";
 
 // Bumpear la versión ante CUALQUIER cambio de shape (ítems removidos, campos renombrados…).
-const STORAGE_KEY = "tacker-eqtorre-draft-v1";
-const STORAGE_TS_KEY = "tacker-eqtorre-draft-ts-v1";
+const STORAGE_KEY = "tacker-eqtorre-draft-v2";
+const STORAGE_TS_KEY = "tacker-eqtorre-draft-ts-v2";
 
 const LEGACY_KEYS: string[] = [
-  // Agregar acá las claves de versiones anteriores al bumpear.
+  // v1 guardaba estados "Sí"/"No"; ahora son "BIEN"/"MAL" y no hay migración posible.
+  "tacker-eqtorre-draft-v1",
+  "tacker-eqtorre-draft-ts-v1",
 ];
 
 function purgeLegacy(): void {

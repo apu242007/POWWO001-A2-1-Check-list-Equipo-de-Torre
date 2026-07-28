@@ -300,7 +300,7 @@ Write-Host "[1/2] Columnas de la lista cabecera" -ForegroundColor Cyan
 
 Ensure-Field -ListId $header.Id -Name "SiteConducted"        -Title "Site conducted"                 -Type Text
 Ensure-Field -ListId $header.Id -Name "ConductedOn"          -Title "Conducted on"                   -Type DateTime
-Ensure-Field -ListId $header.Id -Name "PreparedBy"           -Title "Prepared by"                    -Type Text
+Ensure-Field -ListId $header.Id -Name "PreparedBy"           -Title "Confeccionado por"              -Type Text
 Ensure-Field -ListId $header.Id -Name "Ubicacion"            -Title "Location"                       -Type Text
 
 # Campos de texto que identifican cada sección
@@ -321,8 +321,8 @@ Ensure-Field -ListId $header.Id -Name "SecAnnex"             -Title "Annex"     
 
 Ensure-Field -ListId $header.Id -Name "EstadoGeneral"        -Title "Estado general"                 -Type Choice -Choices @("OK", "OBSERVADO")
 Ensure-Field -ListId $header.Id -Name "TotalItems"           -Title "Total ítems respondidos"        -Type Number
-Ensure-Field -ListId $header.Id -Name "TotalSi"              -Title "Total Sí"                       -Type Number
-Ensure-Field -ListId $header.Id -Name "TotalNo"              -Title "Total No"                       -Type Number
+Ensure-Field -ListId $header.Id -Name "TotalBien"            -Title "Total BIEN"                     -Type Number
+Ensure-Field -ListId $header.Id -Name "TotalMal"             -Title "Total MAL"                      -Type Number
 Ensure-Field -ListId $header.Id -Name "TotalNa"              -Title "Total N/A"                      -Type Number
 Ensure-Field -ListId $header.Id -Name "ObservacionesResumen" -Title "Observaciones relevantes"       -Type Note
 
@@ -344,7 +344,7 @@ Write-Host "[2/2] Columnas de la lista de ítems" -ForegroundColor Cyan
 # OJO: el InternalName es 'CategoriaItem', no 'Categoria' — este último colisiona
 # con una columna oculta por defecto de SharePoint y devuelve 400.
 Ensure-Field -ListId $child.Id -Name "CategoriaItem"     -Title "Categoría"             -Type Text
-Ensure-Field -ListId $child.Id -Name "Estado"            -Title "Estado"                -Type Choice -Choices @("Sí", "No", "N/A", "Abierto", "Cerrado")
+Ensure-Field -ListId $child.Id -Name "Estado"            -Title "Estado"                -Type Choice -Choices @("BIEN", "MAL", "N/A", "Abierto", "Cerrado")
 Ensure-Field -ListId $child.Id -Name "Comentarios"       -Title "Comentarios"           -Type Note
 Ensure-Field -ListId $child.Id -Name "EvidenciaURL"      -Title "Evidencia (archivo)"   -Type Text
 Ensure-Field -ListId $child.Id -Name "Orden"             -Title "Orden"                 -Type Number
